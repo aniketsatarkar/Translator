@@ -7,9 +7,9 @@
           <b-form-select-option
             v-for="(item, index) in languages"
             :key="index"
-            :value="item.language"
+            :value="item.code"
           >
-            {{ item.language }}
+            {{ item.name }}
           </b-form-select-option>
         </b-form-select>
       </b-col>
@@ -19,9 +19,9 @@
           <b-form-select-option
             v-for="(item, index) in languages"
             :key="index"
-            :value="item.language"
+            :value="item.code"
           >
-            {{ item.language }}
+            {{ item.name }}
           </b-form-select-option>
         </b-form-select>
       </b-col>
@@ -47,7 +47,9 @@
 
     <b-row class="mt-3 text-center">
       <b-col>
-        <b-button @click="eachRecursive(json)">Translate</b-button>
+        <b-button @click="eachRecursive(json)">
+          Translate
+        </b-button>
       </b-col>
     </b-row>
   </b-container>
@@ -55,6 +57,7 @@
 
 <script>
 import axios from 'axios'
+import langs from '@/utils/langs'
 
 export default {
   data() {
@@ -80,16 +83,13 @@ export default {
   },
   methods: {
     getLanguages() {
-      axios.get('https://google-translate1.p.rapidapi.com/language/translate/v2/languages', {
-        headers: {
-          'x-rapidapi-host': 'google-translate1.p.rapidapi.com',
-          'x-rapidapi-key': '4ae349c6ffmsh378a87e734fc358p1d8361jsn6609af329c04'
-        }
-      }).then(response => {
-        this.languages = response.data.data.languages
-      }).catch(error => {
-        console.log('ERROR : ', error)
-      })
+      const keys = Object.keys(langs)
+      for (const index in keys) {
+        this.languages.push({
+          name: keys[index],
+          code: langs[keys[index]]
+        })
+      }
     },
     translate(text, from, to) {
       return new Promise((resolve, reject) => {
@@ -97,21 +97,12 @@ export default {
         if (from === undefined || from === null) { reject(null) }
         if (to === undefined || to === null) { reject(null) }
 
-        const params = encodeURI('source=' + from + '&q=' + text + '&target=' + to)
+        const url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=' + from + '&tl=' + to + '&dt=t&q=' + encodeURI(text)
 
-        axios.post('https://google-translate1.p.rapidapi.com/language/translate/v2', params, {
-          headers: {
-            'x-rapidapi-host': 'google-translate1.p.rapidapi.com',
-            'x-rapidapi-key': '4ae349c6ffmsh378a87e734fc358p1d8361jsn6609af329c04',
-            'content-type': 'application/x-www-form-urlencoded'
-          }
-        }).then(response => {
-          // console.log('DATA #1 : ', response.data.data.translations[0].translatedText)
-          // console.log('DATA #2 : ', response.data.data)
-          // console.log('DATA #3 : ', response.data)
-          // resolve(response.data.data.translations[0].translatedText)
+        axios.get(url).then(response => {
+          console.log('DATA : ', response.data[0][0][0])
+          resolve(response.data[0][0][0])
         }).catch(error => {
-          resolve('text') // for testing...
           reject(error)
         })
       })
