@@ -58,7 +58,9 @@ export default {
     this.stack = []
   },
   _triggerChange: function (data) {
+    console.log('this.changed : ', this.changed)
     if (this.changed !== undefined && this.changed !== null) {
+      console.log('this.changed : ', this.changed)
       this.changed(data)
     }
 
