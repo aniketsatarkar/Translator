@@ -1,9 +1,5 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
+  <div id="app" class="cover-container d-flex h-100 p-3 mx-auto flex-column">
     <router-view />
   </div>
 </template>
